@@ -1,5 +1,10 @@
 # Pavol Ňachaj, moje projekty
 
+## [Ovladač do učebny číslo 120](Ovladač_do_učebny_číslo_120/readme.md)
+S tímhle projektem jsem byl jeden z nejlepších 10 z České republiky v [elektrotechnické olympiadě](Ovladač_do_učebny_číslo_120/diplom.jpg).
+V tomto projektu jsem ovládal projektor pomoci IR. Řešil jsem problém s tím, že jediný způsob, jak u projektoru změnit obrazový vstup byl výběr z menu. Natočil jsem video [popisujicí projekt](https://youtu.be/99CuRj4N2So)a [rychlou ukázku](https://youtu.be/Cdun-ippr8c).
+
+
 ## [Silvron](Sivron/readme.md)
 S Filipem Maškem ([Froggytron Frog](https://www.youtube.com/c/FroggytronFrog)) jsme vyhrály [Robotický den](http://robotickyden.cz/2019/) soutěž [Freestyle](http://robotickyden.cz/2019/rules/2019-Free_Style-CZv1.pdf) s robotem Silvron, který vyrobil pro Stop motion animace.
 Já jsem pouze navhnul, vytvořil a naprogramoval elektroniku v křídlech. [Zde je moje prezentace](https://youtu.be/JPhYR3HqWhY)

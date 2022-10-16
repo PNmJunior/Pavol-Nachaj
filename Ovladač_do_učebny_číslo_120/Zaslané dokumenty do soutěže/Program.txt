@@ -1,0 +1,761 @@
+/*
+ Name:		Ovladac_11_15_Final.ino
+ Created:	11/15/2018 9:26:52 PM
+ Author:	Pavel
+*/
+
+
+//Inicializace knihoven
+#include"IRremote2.h"
+#include <Wire.h> 
+#include <Eeprom24C04_16.h>
+
+//inicializace IR vysilani
+IRsend irSend;
+IRsend irSend2;
+
+const int FrekvenceIR_Vysilani = 36;//frekvence vysilani IR LED
+									//Prubeh signalu u platna 
+const unsigned int IrSignalPlatnoNahoru[] = { 1300,350, 1300,400, 1250,400, 1250,400, 450,1250, 400,1250, 400,1300, 400,1250, 450,1200, 450,1250, 1200,450, 500 };  //nahoru
+const unsigned int IrSignalPlatnoDolu[] = { 1200,450, 1300,400, 1250,400, 1300,350, 450,1250, 500,1150, 450,1200, 450,1250, 450,1200, 1250,450, 400,1250, 450 };   //dolu
+const unsigned int IrSignalPlatnoStop[] = { 1300,400, 1250,400, 1250,400, 1250,450, 400,1250, 400,1250, 450,1250, 450,1200, 400,1300, 400,1250, 450,1200, 1300 };
+
+//Prubeh signalu u Projektortu
+const unsigned int IrSignalProjektorVipinani[] = { 8950,4450, 600,500, 550,550, 600,500, 600,550, 600,500, 600,500, 600,500, 600,550, 600,500, 600,500, 600,500, 600,550, 600,1600, 600,1650, 550,550, 600,500, 600,550, 600,1600, 600,550, 600,500, 600,500, 600,500, 600,550, 600,500, 600,1650, 550,550, 600,1600, 600,1650, 600,1650, 600,1650, 550,1650, 600,1650, 550 };//vypinani
+const unsigned int IrSignalProjektorFreeze[] = { 8950,4400, 650,500, 600,500, 550,550, 550,550, 650,500, 550,550, 650,450, 600,500, 650,500, 550,550, 600,500, 600,500, 600,1650, 550,1700, 600,500, 600,500, 600,1650, 650,1600, 600,500, 550,550, 600,500, 650,500, 600,500, 600,500, 600,550, 600,500, 600,1600, 600,1650, 650,1600, 600,1650, 600,1600, 650,1600, 600 };//freeze
+const unsigned int IrSignalProjektorSipkaNahoru[] = { 8900,4450, 600,500, 600,550, 550,550, 550,550, 550,550, 600,550, 550,550, 550,550, 550,550, 600,550, 550,550, 550,550, 550,1700, 550,1650, 600,550, 550,550, 550,1700, 600,1600, 600,550, 550,1650, 600,550, 550,550, 600,500, 600,500, 600,550, 550,550, 550,1700, 550,550, 550,1650, 600,1650, 600,1650, 550,1650, 600 };//nahoru
+const unsigned int IrSignalProjektorSipkaDolu[] = { 8900,4450, 600,550, 550,550, 600,500, 550,550, 600,550, 550,550, 600,500, 600,500, 600,550, 600,500, 600,500, 600,500, 600,1650, 550,1700, 600,500, 550,600, 550,550, 550,550, 550,1650, 600,1650, 600,500, 600,550, 550,550, 550,600, 550,1650, 600,1650, 550,550, 550,550, 550,1700, 600,1600, 600,1650, 550,1700, 550 };//dolu
+const unsigned int IrSignalProjektorSource[] = { 8950,4450, 550,600, 500,600, 500,550, 650,550, 500,550, 550,600, 550,650, 450,550, 550,600, 550,550, 550,550, 550,550, 600,1650, 550,1650, 600,600, 450,600, 550,600, 550,550, 500,1750, 550,600, 500,550, 550,550, 600,600, 500,600, 650,1550, 550,1700, 500,600, 550,1700, 500,1700, 550,1700, 550,1700, 600,1650, 500 };  // UNKNOWN CC57C043
+const unsigned int IrSignalProjektorOk[] = { 9000,4450, 600,500, 600,500, 650,500, 600,500, 650,500, 600,500, 600,550, 600,500, 600,550, 600,500, 600,550, 600,500, 600,1650, 600,1650, 600,500, 650,500, 600,500, 650,500, 600,500, 650,500, 600,1650, 600,500, 600,550, 600,500, 600,1650, 600,1650, 600,1650, 600,1650, 600,500, 650,1600, 650,1600, 600,1650, 600 };  // NEC C08F7
+
+																																																																																										  //Cislo tlacitek		
+#define TlacitkoZapVyp 	0
+#define TlacitkoMonitor	1
+#define TlacitkoKamera	2
+#define TlacitkoSpecial 3
+#define TlacitkoFreeze	4
+#define TlacitkoPlatno	5
+
+																																																																																										  //Systemove cislo nastavovacich mikrospinacu
+#define MicroSpinSET 6
+#define MicroSpinAUTO 7
+																																																																																										  //Vzstup z posuvneho registru pri zjistovani stavu tlacitek a nastavovacich mikrospinacu
+byte MozPrep[] = { B00000001,B00000010,B00000100,B00001000,B00010000,B00100000,B01000000,B10000000,B00000000 };
+
+//Pini na ATmega328P
+#define PinLatch 6  //RCLK   (12) 
+#define PinClock 7  //SRCLK  (11)
+#define PinData 5   //Data   (14)
+#define PinIrLED 3
+#define PinTlac 8
+#define PinKont 2
+
+//Moznasti specialniho tlacitka
+#define Jako_canal			0
+#define Jako_STOP_platna	1
+#define Jako_bez_funkce		2
+#define Jako_vypis_Help		3
+#define Jako_jine			4
+#define Jako__Max_hodnot	5
+byte Special_Tlacitko = Jako_STOP_platna;
+
+//Hlavni promene
+char vykonavanyPrikaz = 'X';          //Hlavní promìnná pro prepinani canalu: V=Vip/Zap; M=Canal_Monitor; C=Kamera; S=Canal_Special; F=Freeze; P=Platno nahoru/dolu;
+bool detekceZadaniPrikazu = false;    //Detekce zmìni - detekce prikazu, ukonu
+byte registrTlacitka = B00000000;     //Registr na tlacitka - pomoci teho promene arduino zjistuje jake je zmaèknute tlacitko
+byte registrZobrazeni = B00000000;     //Zobrazení na LED
+bool StavProjektor = false;      //zapinani/vypnuto projektor
+bool StavPlatno = false;     //Vytazene/nasunute platno
+bool StavFreeze = false;     //Zamrazen/odmrazen obraz
+bool StavSpecial = false;
+bool DetekceZmenyCanaluProjektoru = false;
+char zadanyPrikaz = 0;           //promena, ktera se pouziva pri nacitani tlacitek
+char CanalCil;
+
+//Pohyb pri posunovani na ve Source
+char canalNow = 0;
+char canalOld = 0;
+char kroky = 0;
+
+//Vypis konektoru projektoru v Source
+#define KonektorCanalProjektor__Pocet			5
+#define KonektorCanalProjktor_YBp1Pr1_Pocitac1	0
+#define KonektorCanalProjektor_YBp2Pr2_Pocitac2	1
+#define KonektorCanalProjektor_HDMI				2
+#define KonektorCanalProjekort_Vidio			3
+#define KonektorCanalProjektor_S_Video			4
+
+//Prizazeni canalu s kterymi pracujeme
+#define Canal_Monitor	KonektorCanalProjktor_YBp1Pr1_Pocitac1
+#define Canal_Camera	KonektorCanalProjekort_Vidio
+#define Canal_Special	KonektorCanalProjektor_HDMI
+
+//Instrukce pro cteni a zapis na Eeprom
+#define EepromNow				true
+#define EepromOld				false
+#define RadekEepromNowOld		20
+#define RadekEepromProjektor	0
+#define RadekEepromPlatno		1
+#define RadekEepromFreeze		2
+#define RadekEepromKanal		3
+#define RadekEepromLed			4
+#define RadekEepromSpecial		5
+#define RadekEepromSpecialTyp	6
+#define EEPROM_ADDRESS  0x50
+static Eeprom24C04_16 eeprom(EEPROM_ADDRESS);
+#define KontolaEeprom_pocet  5
+byte KontolaEepromZadano[KontolaEeprom_pocet] = { 1,2,3,4,5 };
+byte KontolaEepromPrecteno[KontolaEeprom_pocet];
+#define PocetMistZapisu	7
+byte DataNactena[PocetMistZapisu];
+#define PocatecniMistZapisu	10
+
+//Ovladani signalizacni LED
+#define LedKontOn	digitalWrite(PinKont, HIGH);	//Zapne se Signalizacni Led
+#define LedKontOff	digitalWrite(PinKont, LOW);		//Vipne se Signalizacni Led
+
+//Seznam cekani na ...
+#define DobaCekaniTlacitka		5 //ms
+#define DobaCekaniNaOffProj		1000//ms
+#define DobaBlikuZakazFunkce	100//ms
+
+//klavesove prikazy
+#define ZapVypKlaves0 'V'
+#define ZapVypKlaves1 'v'
+#define ZapVypKlaves2 'Z'
+#define ZapVypKlaves3 'z'
+#define PlatnoKlaves0 'P'
+#define	PlatnoKlaves1 'p'
+#define FreezeKlaves0 'F'
+#define FreezeKlaves1 'f'
+#define MonitorKlaves0 'm'
+#define MonitorKlaves1 'M'
+#define KameraKlaves0 'C'
+#define	KameraKlaves1 'c'
+#define	KameraKlaves2 'K'
+#define	KameraKlaves3 'k'
+#define SpecialKlaves0 'S'
+#define	SpecialKlaves1 's'
+#define Special_SET_Klaves0 '#'
+#define	Langue_SET_Klaves0 '@'
+
+//Zobrazeni LED
+#define ZobVypOff	B00000001
+#define ZobVypOn	B00000010
+#define ZobMonitor	B00000100
+#define ZobCamera	B00001000
+#define ZobSpecial	B00010000
+#define ZobFreeze	B00100000
+#define ZobPlatNah	B01000000
+#define ZobPlatDol	B10000000
+#define ZobPlat		B11000000
+#define ZobCanalSSpecial	B11100011
+#define ZobCanalBezSpecial	B11110011
+byte ZobCanal = ZobCanalSSpecial;
+
+
+void setup()
+{
+	//Inicilializovani pini
+	pinMode(PinKont, OUTPUT);
+	pinMode(PinTlac, INPUT);
+	pinMode(PinLatch, OUTPUT);
+	pinMode(PinClock, OUTPUT);
+	pinMode(PinData, OUTPUT);
+	//PinIrLED neni nutne nainicializovat
+	LedKontOn
+		eeprom.initialize();
+	Serial.begin(9600);		//Inicializace seriove komunikace
+	delay(1000);
+	NacteniEeprom();
+	delay(1000);
+	LedKontOff
+}
+
+
+void loop()
+{
+	zadanyPrikaz = 0;
+	detekceZadaniPrikazu = false;
+	if (Serial.available() > 0)
+	{
+		LedKontOn
+			zadanyPrikaz = Serial.read();
+		detekceZadaniPrikazu = true;
+	}
+	else
+	{
+		zadanyPrikaz = 0;
+		do
+		{
+			registrTlacitka = MozPrep[zadanyPrikaz];
+			Registr();
+			delay(DobaCekaniTlacitka);
+			if (digitalRead(PinTlac) == HIGH)
+			{
+				LedKontOn
+					detekceZadaniPrikazu = true;
+			}
+			else
+			{
+				zadanyPrikaz += 1;
+			}
+		} while (detekceZadaniPrikazu == false && zadanyPrikaz <= 5);
+	}
+
+	if (detekceZadaniPrikazu == true)
+	{
+		delay(1000);
+		PrvotniZpracovani();
+		if (DetekceZmenyCanaluProjektoru == true)
+		{
+			CanalyProjektoru();
+		}
+		do
+		{
+			delay(100);
+			registrTlacitka = MozPrep[zadanyPrikaz];
+			Registr();
+			delay(DobaCekaniTlacitka);
+		} while (digitalRead(PinTlac) == HIGH);
+		EepromUkladani();
+		LedKontOff
+	}
+}
+
+
+void NacteniEeprom()
+{
+	registrZobrazeni = ZobVypOff | ZobPlatNah;
+	if (NacteniEepromNowOld() == EepromNow)
+	{
+		//Inicializace
+		eeprom.writeBytes(RadekEepromNowOld, KontolaEeprom_pocet, KontolaEepromZadano);
+
+		DataNactena[RadekEepromProjektor] = false;
+		DataNactena[RadekEepromPlatno] = false;
+		DataNactena[RadekEepromKanal] = Canal_Monitor;
+		DataNactena[RadekEepromFreeze] = false;
+		DataNactena[RadekEepromLed] = registrZobrazeni;
+		DataNactena[RadekEepromSpecial] = false;
+		DataNactena[RadekEepromSpecialTyp] = Jako_canal;
+		eeprom.writeBytes(PocatecniMistZapisu, PocetMistZapisu, DataNactena);
+		Chyba(1);
+	}
+	if (NacteniEepromNowOld() == EepromOld)
+	{
+		eeprom.readBytes(PocatecniMistZapisu, PocetMistZapisu, DataNactena);
+		StavProjektor = DataNactena[RadekEepromProjektor];
+		StavPlatno = DataNactena[RadekEepromPlatno];
+		StavFreeze = DataNactena[RadekEepromFreeze];
+		canalOld = DataNactena[RadekEepromKanal];
+		StavSpecial = DataNactena[RadekEepromSpecial];
+		registrZobrazeni = DataNactena[RadekEepromLed];
+		Special_Tlacitko = DataNactena[RadekEepromSpecialTyp];
+	}
+	else
+	{
+		StavProjektor = true;
+		StavPlatno = false;
+		StavFreeze = false;
+		canalOld = Canal_Monitor;
+		Chyba(2);
+	}
+	Registr();
+	delay(100);
+	Registr();
+}
+
+
+bool NacteniEepromNowOld() //Old = 0   Now = 1
+{
+	bool Potvrzeni = EepromOld;
+	eeprom.readBytes(RadekEepromNowOld, KontolaEeprom_pocet, KontolaEepromPrecteno);
+	for (byte i = 0; i < KontolaEeprom_pocet; i++)
+	{
+		if (KontolaEepromPrecteno[i] != KontolaEepromZadano[i])
+		{
+			Potvrzeni = EepromNow;
+		}
+	}
+	return Potvrzeni;
+}
+
+
+void EepromUkladani()
+{
+	DataNactena[RadekEepromProjektor] = StavProjektor;
+	DataNactena[RadekEepromPlatno] = StavPlatno;
+	DataNactena[RadekEepromKanal] = canalOld;
+	DataNactena[RadekEepromFreeze] = StavFreeze;
+	DataNactena[RadekEepromLed] = registrZobrazeni;
+	DataNactena[RadekEepromSpecial] = StavSpecial;
+	DataNactena[RadekEepromSpecialTyp] = Special_Tlacitko;
+	eeprom.writeBytes(PocatecniMistZapisu, PocetMistZapisu, DataNactena);
+}
+
+
+void PrvotniZpracovani()
+{
+	switch (zadanyPrikaz)
+	{
+	case TlacitkoZapVyp:case ZapVypKlaves0:case ZapVypKlaves1:case ZapVypKlaves2:case ZapVypKlaves3://Zapnuti/vypnuti
+		vykonavanyPrikaz = 'Z';//zapinani
+		if (StavProjektor == true)
+		{
+			//vypinani
+			Serial.println(F("Vypinani projektoru"));
+			StavProjektor = false;
+			registrZobrazeni = registrZobrazeni & ZobPlat;//nemenit, funkce jsou nefunkcni
+			registrZobrazeni = registrZobrazeni | ZobVypOff;
+			StavFreeze = false;
+			VysilaniIR('R', 'V');
+			delay(DobaCekaniNaOffProj);		//kvuli casove oddeleni potvryrni vipinaciho signalu
+		}
+		else
+		{
+			//zapninani
+			Serial.println(F("Zapinani projektoru"));
+			StavProjektor = true;
+			registrZobrazeni = registrZobrazeni & ~ZobVypOff;
+			registrZobrazeni = registrZobrazeni | ZobVypOn;
+			switch (canalOld)
+			{
+			case Canal_Monitor:
+				registrZobrazeni = registrZobrazeni | ZobMonitor;
+				Serial.println(F("Obraz z monitoru (pocitace)"));
+				break;
+			case Canal_Camera:
+				registrZobrazeni = registrZobrazeni | ZobCamera;
+				Serial.println(F("Obraz z kamery"));
+				canalNow = Canal_Camera;
+				break;
+			case Canal_Special:
+				if (Special_Tlacitko == Jako_canal)
+				{
+					registrZobrazeni = registrZobrazeni | ZobSpecial;
+					Serial.println(F("Obraz ze stavebnice"));
+					canalNow = Canal_Special;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		VysilaniIR('R', 'V');//vzdi to bude vyslano
+		if (AUTO() && StavProjektor != StavPlatno)
+		{
+			delay(DobaCekaniNaOffProj);
+			PlatnoOvladani();
+		}
+		break;//Platno nic neudela pokud je mod SET nebo pokud Zap a Plat se rovnaj...
+	case TlacitkoPlatno:case PlatnoKlaves0:case PlatnoKlaves1:
+		PlatnoOvladani();
+		break;
+	case TlacitkoFreeze:case FreezeKlaves0:case FreezeKlaves1:
+		vykonavanyPrikaz = 'F';//free
+		FreezeOvladani();
+		break;
+	case TlacitkoMonitor:case MonitorKlaves0:case MonitorKlaves1:
+		vykonavanyPrikaz = 'M';//pocitac
+		DetekceZmenyCanaluProjektoru = true;
+		registrZobrazeni = registrZobrazeni & ZobCanal;
+		registrZobrazeni = registrZobrazeni | ZobMonitor;
+		Registr();
+		Serial.println(F("Obraz z monitoru (pocitace)"));
+		canalNow = Canal_Monitor;
+		break;
+	case TlacitkoKamera:case KameraKlaves0:case KameraKlaves1:case KameraKlaves2:case KameraKlaves3:
+		vykonavanyPrikaz = 'C';//kamera
+		DetekceZmenyCanaluProjektoru = true;
+		registrZobrazeni = registrZobrazeni & ZobCanal;
+		registrZobrazeni = registrZobrazeni | ZobCamera;
+		Registr();
+		Serial.println(F("Obraz z kamery"));
+		canalNow = Canal_Camera;
+		break;
+	case TlacitkoSpecial:case SpecialKlaves0:case SpecialKlaves1://Bez funkce:
+		vykonavanyPrikaz = 'S';
+		switch (Special_Tlacitko)
+		{
+		case Jako_canal:
+			DetekceZmenyCanaluProjektoru = true;
+			registrZobrazeni = registrZobrazeni & ZobCanal;
+			registrZobrazeni = registrZobrazeni | ZobSpecial;
+			Registr();
+			Serial.println(F("Obraz ze stavebnice"));
+			canalNow = Canal_Special;
+			break;
+		case Jako_STOP_platna:
+			if (StavSpecial == true)
+			{
+				StavSpecial = false;
+				registrZobrazeni = registrZobrazeni & ~ZobSpecial;
+				if (StavPlatno == true)
+				{
+					StavPlatno = false;
+				}
+				else
+				{
+					StavPlatno = true;
+				}
+				PlatnoOvladani();
+			}
+			else
+			{
+				StavSpecial = true;
+				registrZobrazeni = registrZobrazeni | ZobSpecial;
+				Serial.println(F("STOP platnu."));
+				VysilaniIR('L', 'S');
+			}
+			break;
+		case Jako_bez_funkce:
+			break;
+		case Jako_vypis_Help:
+			registrZobrazeni = registrZobrazeni | ZobSpecial;
+			Registr();
+			Help();
+			registrZobrazeni = registrZobrazeni & ~ZobSpecial;
+			Registr();
+			break;
+		case Jako_jine:
+			break;
+		default:
+			break;
+		}
+	case Langue_SET_Klaves0:
+		break;
+	case Special_SET_Klaves0:
+		if (Special_Tlacitko == Jako__Max_hodnot - 1)
+		{
+			Special_Tlacitko = 0;
+		}
+		else
+		{
+			Special_Tlacitko += 1;
+		}
+		if (Special_Tlacitko == Jako_canal)
+		{
+			ZobCanal = ZobCanalSSpecial;
+		}
+		else
+		{
+			ZobCanal = ZobCanalBezSpecial;
+		}
+
+		break;
+	default:
+		Chyba(0);
+	}
+}
+
+
+void CanalyProjektoru()
+{
+	if (StavProjektor == true)
+	{
+		CanalCil = vykonavanyPrikaz;
+		kroky = canalOld - canalNow;
+		if (kroky != 0)
+		{
+			if (abs(kroky) > (KonektorCanalProjektor__Pocet / 2))
+			{
+				if (kroky < 0)
+				{
+					kroky += KonektorCanalProjektor__Pocet;
+				}
+				else
+				{
+					kroky -= KonektorCanalProjektor__Pocet;
+				}
+			}
+			if (StavFreeze == true)
+			{
+				FreezeOvladani();
+				delay(DobaCekaniNaOffProj);
+			}
+			VysilaniIR('R', 'S');
+			if (kroky > 0)
+			{
+				for (char i = 0; i < kroky; i++)
+				{
+					VysilaniIR('R', 'N');
+					delay(DobaCekaniNaOffProj);
+				}
+			}
+			else
+			{
+				for (char i = 0; i < ((-1)*kroky); i++)
+				{
+					VysilaniIR('R', 'D');
+					delay(DobaCekaniNaOffProj);
+				}
+			}
+			delay(DobaCekaniNaOffProj);
+			VysilaniIR('R', 'O'); //VysilaniIR('R', 'S'); VysilaniIR('R', 'S');
+		}
+		canalOld = canalNow;
+	}
+	else
+	{
+		registrZobrazeni = registrZobrazeni & ZobCanal;
+		Registr();
+		ZakazFunkce();
+	}
+	DetekceZmenyCanaluProjektoru = false;
+}
+
+
+void PlatnoOvladani()
+{
+	vykonavanyPrikaz = 'P';//platno
+	if (StavPlatno == true)
+	{
+		//zasunovani
+		StavPlatno = false;
+		registrZobrazeni = registrZobrazeni & ~ZobPlatDol;
+		registrZobrazeni = registrZobrazeni | ZobPlatNah;
+		Serial.println(F("Platno se zasunuje"));
+		VysilaniIR('L', 'N');
+	}
+	else
+	{
+		//vytahovani
+		StavPlatno = true;
+		registrZobrazeni = registrZobrazeni & ~ZobPlatNah;
+		registrZobrazeni = registrZobrazeni | ZobPlatDol;
+		Serial.println(F("Platno se vysunuje"));
+		VysilaniIR('L', 'D');
+	}
+}
+
+
+void FreezeOvladani()
+{
+	if (StavProjektor == true)
+	{
+		if (StavFreeze == true)
+		{
+			//odmrazit
+			StavFreeze = false;
+			registrZobrazeni = registrZobrazeni & ~ZobFreeze;
+			Serial.println(F("Obraz je spusten"));
+			VysilaniIR('R', 'F');
+		}
+		else
+		{
+			//zamrazit
+			StavFreeze = true;
+			registrZobrazeni = registrZobrazeni | ZobFreeze;
+			Serial.println(F("Obraz je zamrazen"));
+			VysilaniIR('R', 'F');
+		}
+	}
+	else
+	{
+		ZakazFunkce();
+	}
+}
+
+
+void ZakazFunkce()
+{
+	Serial.println(F("Projektor je vipnuty. Funkce mimo provoz."));
+
+	Blikani(DobaBlikuZakazFunkce, DobaBlikuZakazFunkce, 8);
+}
+
+
+void VysilaniIR(char Typ, char Pokyn)
+{
+	Registr();
+	if (WORK())
+	{
+		delay(100);
+		if (Typ == 'R')//platno
+		{
+			switch (Pokyn)
+			{
+			case 'V'://vypinani
+				irSend.sendRaw(IrSignalProjektorVipinani, sizeof(IrSignalProjektorVipinani) / sizeof(IrSignalProjektorVipinani[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'F':
+				irSend.sendRaw(IrSignalProjektorFreeze, sizeof(IrSignalProjektorFreeze) / sizeof(IrSignalProjektorFreeze[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'D':
+				irSend.sendRaw(IrSignalProjektorSipkaDolu, sizeof(IrSignalProjektorSipkaDolu) / sizeof(IrSignalProjektorSipkaDolu[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'N':
+				irSend.sendRaw(IrSignalProjektorSipkaNahoru, sizeof(IrSignalProjektorSipkaNahoru) / sizeof(IrSignalProjektorSipkaNahoru[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'S':
+				irSend.sendRaw(IrSignalProjektorSource, sizeof(IrSignalProjektorSource) / sizeof(IrSignalProjektorSource[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'O':
+				irSend.sendRaw(IrSignalProjektorOk, sizeof(IrSignalProjektorOk) / sizeof(IrSignalProjektorOk[0]), FrekvenceIR_Vysilani);
+				break;
+			default:;
+			}
+		}
+		else
+		{
+			switch (Pokyn)
+			{
+			case 'D':
+				irSend2.sendRaw(IrSignalPlatnoDolu, sizeof(IrSignalPlatnoDolu) / sizeof(IrSignalPlatnoDolu[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'N':
+				irSend2.sendRaw(IrSignalPlatnoNahoru, sizeof(IrSignalPlatnoNahoru) / sizeof(IrSignalPlatnoNahoru[0]), FrekvenceIR_Vysilani);
+				break;
+			case 'S':
+				irSend2.sendRaw(IrSignalPlatnoStop, sizeof(IrSignalPlatnoStop) / sizeof(IrSignalPlatnoStop[0]), FrekvenceIR_Vysilani);
+				break;
+			default:;
+			}
+		}
+	}
+}
+
+
+bool WORK()
+{
+	registrTlacitka = MozPrep[MicroSpinSET];
+	Registr();
+	delay(DobaCekaniTlacitka);
+	if (digitalRead(PinTlac) == HIGH)
+	{
+		Serial.println(F("Nastaven SET mod."));
+		return false;//Mod SET
+	}
+	else
+	{
+		return true;//Mos Work
+	}
+}
+
+
+bool AUTO()
+{
+	registrTlacitka = MozPrep[MicroSpinAUTO];
+	Registr();
+	delay(DobaCekaniTlacitka);
+	if (digitalRead(PinTlac) == HIGH)
+	{
+		Serial.print(F("Vypnutá automatika platna."));
+		return false;//Vypla Automatika platna
+	}
+	else
+	{
+		return true;//Zapla Automatika platna
+	}
+}
+
+
+void Registr()//Zobrazeni obrazu
+{
+	digitalWrite(PinLatch, LOW);
+	shiftOut(PinData, PinClock, MSBFIRST, registrTlacitka);
+	shiftOut(PinData, PinClock, MSBFIRST, registrZobrazeni);
+	digitalWrite(PinLatch, HIGH);
+}
+
+
+void Chyba(byte UsekProg)
+{
+	switch (UsekProg)
+	{
+	case 0:
+		Serial.println(F("ERROR_0"));
+		Serial.println(F("Muze indikovat:"));
+		Serial.println(F("Zmackli jste klavesu, ke ktere neni prirazena funkce."));
+		Serial.println(F("Tlacitka maji poruchu nebo ma poruchu pridavna konzole."));
+		Serial.println(F("Chyba softeweru."));
+		Serial.println(F("Jina chyba."));
+		ZakazFunkce();
+		break;
+	case 1:
+		Serial.println(F("ERROR_EEPROM_1"));
+		Serial.println(F("Muze indikovat:"));
+		Serial.println(F("Nova EEPROM."));
+		Serial.println(F("Automaticka oprava:"));
+		Serial.println(F("System nahrava na EEPROM predpripraveny defoltni zaznam o stavu ovladace."));
+		Serial.println(F("Pokut byly na EEPROM data, budou vymazany."));
+		Blikani(200, 200, 4);
+		break;
+	case 2:
+		Serial.println(F("ERROR_EEPROM_2"));
+		Serial.println(F("Muze indikovat:"));
+		Serial.println(F("Potize s komunikaci s EEPROM."));
+		Serial.println(F("Oprava:"));
+		Serial.println(F("Prosim zkontrolujte EEPROM."));
+		Serial.println(F("Pri castem opakovani, vlozte novou EEPROM do zarizeni."));
+		Serial.println(F("Softwerova oprava:"));
+		Serial.println(F("System si sytvoril imaginarni EEPROM, jejiz hodnoty jsou defoltne nastaveny."));
+		Blikani(200, 400, 4);
+		break;
+	default:
+		break;
+	}
+	Help();
+}
+
+
+void Help()
+{
+	Serial.println(F("HELP"));
+	Serial.println(F("Pozadali jste o pomoc, zadali jste spatny prikaz, nebo nestala chyba."));
+	Serial.println(F("Prikazova tabulka je nasledujici:"));
+	Serial.println(F(" Tlacitko |  Prikaz  | Popis"));
+	Serial.println(F("==========|==========|==========>>"));
+	Serial.println(F("    ?     | Z,z,V,v  | Vypne nebo zapne projektor. Pokud je Automatizace zapnuta, pak se plato samo sroluje nebo roztahne."));
+	Serial.println(F("   MON    |   M,m    | Obraz prepne na monitor (pocitac u katedry)."));
+	Serial.println(F("    C-    | C,c,K,k  | Obraz prepne na kameru."));
+
+	switch (Special_Tlacitko)
+	{
+	case Jako_canal:
+		Serial.println(F("    St    |   S,s    | Obraz prepne na Stavebnici."));
+		break;
+	case Jako_STOP_platna:
+		Serial.println(F("    St    |   S,s    | Zastavi pohyb platna."));
+		break;
+	case Jako_bez_funkce: case Jako_jine:
+		Serial.println(F("    St    |   S,s    | Nema funkci."));
+		break;
+	case Jako_vypis_Help:
+		Serial.println(F("    St    |   S,s    | Vipise hlasku HELP."));
+		break;
+	default:
+		break;
+	}
+
+	Serial.println(F("   -F-    |   F,f    | Obraz se zamrazi/odmrazi."));
+	Serial.println(F("[(90°otoc)|   P,p    | Vysouva/zasouva platno."));
+
+	Serial.println(F("\nDalsi klavesove zkratky, ktere nemaji tlacitko."));
+	Serial.println(F("  Prikaz  | Popis"));
+	Serial.println(F("==========|==========>>"));
+	Serial.println(F("   H,h    | Vipise hlasku HELP.\n"));
+	Serial.print(F("    #     | Zmeni funkce tlacitka special. Ted ma funkci pod cislem:")); Serial.println(Special_Tlacitko);
+	Serial.println("0: Canal; 1: STOP platnu; 2: bez funkce; 3: vypis Help; 4: Jine.\n");
+
+	Serial.println(F("Nastavovaci microspinace:"));
+	Serial.println(F("Cislo|        Nazev        | funkce"));
+	Serial.println(F("=====|=====================|==========>>"));
+	Serial.println(F("  1  |  Napajeni ovladace  | Napajeci ovladani ovladace.\n"));
+	Serial.println(F("  2  |    Nastaveni modu   | V SET poloze se vypne IR LED => Pouzivejte, jen pri dezinchronizaci."));
+	Serial.println(F("  3  |         PIEZO       | Spusti zvukovou signalizaci."));
+	Serial.println(F("  4  | Automatizace platna | V Off poloze se zapinani a vipinani projektoru vysunuje zasunuje platno. V On nema zapinani a vypinan projektoru na platno vliv."));
+}
+
+
+void Blikani(int CasSviceni, int CasZhasnuti, byte Kolikrat)
+{
+	for (byte i = 0; i < Kolikrat; i++)
+	{
+		LedKontOff
+			delay(CasZhasnuti);
+		LedKontOn
+			delay(CasSviceni);
+	}
+}
