@@ -1,5 +1,9 @@
 # Pavol Ňachaj, moje projekty
 
+## [Užlabinos](Užlabinos/readme.md)
+Se spolužáky jsem se zučastnil [Robotiady](https://robotiada.cz/) v 2019. Já jsem dělal na robotovi pro [SPRINT](https://docs.google.com/spreadsheets/d/1w59QGPwkrG8gr4lbZo96pJLWGmmyXTDxJVfM12Oplos/edit#gid=242107317). 
+Co vim, tak jsem měl nejrychlejšího robota pouze z LEGA.
+
 ## [Ovladač do učebny číslo 120](Ovladač_do_učebny_číslo_120/readme.md)
 S tímhle projektem jsem byl jeden z nejlepších 10 z České republiky v [elektrotechnické olympiadě](Ovladač_do_učebny_číslo_120/diplom.jpg).
 V tomto projektu jsem ovládal projektor pomoci IR. Řešil jsem problém s tím, že jediný způsob, jak u projektoru změnit obrazový vstup byl výběr z menu. Natočil jsem video [popisujicí projekt](https://youtu.be/99CuRj4N2So)a [rychlou ukázku](https://youtu.be/Cdun-ippr8c).
