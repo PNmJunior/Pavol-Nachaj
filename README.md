@@ -1,5 +1,8 @@
 # Pavol Ňachaj, moje projekty
 
+## [HobbyRobot team Sezóna 2016/2017](http://hobbyrobot.team/season-2016-2017/)
+Byl jsem členem tohoto týmu v sezoně 2016/2017. Soutěžili jsme v [FLL](https://www.firstlegoleague.org/past-challenges). Postoupili jsme z pražského kola  do východoevropského kola v  Debrecíně, kde jsme vyhráli vědecký projekt. Zábývali jsme se senzormi do netopýří budky.
+
 ## [Užlabinos](Užlabinos/readme.md)
 Se spolužáky jsem se zučastnil [Robotiady](https://robotiada.cz/) v 2019. Já jsem dělal na robotovi pro [SPRINT](https://docs.google.com/spreadsheets/d/1w59QGPwkrG8gr4lbZo96pJLWGmmyXTDxJVfM12Oplos/edit#gid=242107317). 
 Co vim, tak jsem měl nejrychlejšího robota pouze z LEGA.
