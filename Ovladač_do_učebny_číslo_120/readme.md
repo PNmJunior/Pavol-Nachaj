@@ -6,4 +6,5 @@ V tomto projektu jsem ovládal projektor pomoci IR. Řešil jsem problém s tím
 [![Popis projektu](https://img.youtube.com/vi/99CuRj4N2So/0.jpg)](https://www.youtube.com/watch?v=99CuRj4N2So)
 
 a [rychlou ukázku](https://youtu.be/Cdun-ippr8c).
+
 [![Ukázka](https://img.youtube.com/vi/Cdun-ippr8c/0.jpg)](https://www.youtube.com/watch?v=Cdun-ippr8c)
