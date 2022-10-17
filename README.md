@@ -4,8 +4,11 @@
 Byl jsem členem tohoto týmu v sezoně 2016/2017. Soutěžili jsme v [FLL](https://www.firstlegoleague.org/past-challenges). Postoupili jsme z pražského kola  do východoevropského kola v  Debrecíně, kde jsme vyhráli vědecký projekt. Zábývali jsme se senzormi do netopýří budky.
 
 ## [Užlabinos](Užlabinos/readme.md)
-Se spolužáky jsem se zučastnil [Robotiady](https://robotiada.cz/) v 2019. Já jsem dělal na robotovi pro [SPRINT](https://docs.google.com/spreadsheets/d/1w59QGPwkrG8gr4lbZo96pJLWGmmyXTDxJVfM12Oplos/edit#gid=242107317). 
-Co vim, tak jsem měl nejrychlejšího robota pouze z LEGA.
+Se spolužáky jsem se zučastnil [Robotiady](https://robotiada.cz/) v 2019. Já jsem sestavil a naprogramoval robota na disciplínu [SPRINT](https://docs.google.com/spreadsheets/d/1w59QGPwkrG8gr4lbZo96pJLWGmmyXTDxJVfM12Oplos/edit#gid=242107317). 
+Co vim, tak jsem měl nejrychlejšího robota postaveného pouze z LEGA.
+
+## [Junior Hackathon 2018](Junior_Hackathon_2018/redme.md)
+Firma [Já czech](https://jaczech.org/novinky/posts/2018/october/junior-hackathon-2018-v%C3%BDzva-pro-program%C3%A1torsk%C3%A9-talenty/) pořádala v Brně Junior Hackaton, kde jsem byl s školním týmem s názvem [Meltdown](https://www.hackathons.cz/looking-back-to-junior-hackathon-2018/). Ujal jsem se vedení a navazal jsem na práci týmu HobbyRobot. Díky webařům a dalším ajťákům jsme dokázaly celý koncept posunout na výšší úroveň. 
 
 ## [Ovladač do učebny číslo 120](Ovladač_do_učebny_číslo_120/readme.md)
 S tímhle projektem jsem byl jeden z nejlepších 10 z České republiky v [elektrotechnické olympiadě](Ovladač_do_učebny_číslo_120/diplom.jpg).
