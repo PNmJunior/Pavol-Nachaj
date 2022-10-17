@@ -15,6 +15,15 @@ Firma se zabýva přeprodejem průmyslových komponentů:
 Zkoušel jsem pracovat s průmyslovými komponenty. Rozeznavaní počtu vrstev materiálu pomoci ultrazvuku. Propagace. Prace na objednávkách.
 
 
+## [NETTO Electronics](https://www.vahynetto.cz/)
+Firma se zabývá:
+- Přeprodej a kalibrací váh pro průmysl, laboratoře a lékařstvý.
+- Výrobou vážicích systému a vah.
+- Řízení výroby a skladů.
+- A servis zmíněných věcí.
+
+Kalibroval a sestavoval jsem zde váhy. Sestavoval jsem rozvaděče pro vážení a řízení výroby. Výroba průmyslových elektronických komponentů a kabeláže.
+
 ---------------
 
 # Projekty
