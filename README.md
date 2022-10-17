@@ -1,4 +1,23 @@
-# Pavol Ňachaj, moje projekty
+# Pavol Ňachaj
+
+# Odborné praxe
+
+## [OEM Automatic](https://www.oemautomatic.cz/)
+Firma se zabýva přeprodejem průmyslových komponentů:
+- Elektrické rozvaděče
+- Elektrické stroje
+- Bezpečnostní prvky
+- Motory
+- Railway a Mobile Vehicle
+- Tlak a průtok
+- Electronics
+
+Zkoušel jsem pracovat s průmyslovými komponenty. Rozeznavaní počtu vrstev materiálu pomoci ultrazvuku. Propagace. Prace na objednávkách.
+
+
+---------------
+
+# Projekty
 
 ## [HobbyRobot team Sezóna 2016/2017](http://hobbyrobot.team/season-2016-2017/)
 Byl jsem členem tohoto týmu v sezoně 2016/2017. Soutěžili jsme v [FLL](https://www.firstlegoleague.org/past-challenges). Postoupili jsme z pražského kola  do východoevropského kola v  Debrecíně, kde jsme vyhráli vědecký projekt. Zábývali jsme se senzormi do netopýří budky.
