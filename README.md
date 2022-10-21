@@ -4,6 +4,7 @@
 
 ## [OEM Automatic spol s.r.o.](https://www.oemautomatic.cz/)
 Od 21.5.2018 do 1.6.2018
+
 Obchodní zastoupení firem, které nemají v Čechách vlastní obchodní zastoupení. 
 Přeprodej věcí, zařízeni, senzorů a jiných věcí pro průmysl.
 
@@ -12,6 +13,7 @@ Zkoušel jsem pracovat s průmyslovými komponenty. Rozeznávaní počtu vrstev 
 
 ## [NETTO Electronics s.r.o.](https://www.vahynetto.cz/)
 Od 20.5.2019 do 30.5.2019
+
 Firma se zabývá:
 - Přeprodej a kalibrací vah pro průmysl, laboratoře a lékařství.
 - Výrobou vážicích systému a vah.
