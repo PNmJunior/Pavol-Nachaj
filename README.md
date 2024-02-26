@@ -46,6 +46,11 @@ S Filipem Maškem ([Froggytron Frog](https://www.youtube.com/c/FroggytronFrog)) 
 Já jsem pouze navhnul, vytvořil a naprogramoval elektroniku v křídlech. [Zde je moje prezentace](https://youtu.be/JPhYR3HqWhY).
 
 ## [Maturitní práce](Maturitní_práce/)
+
+[Rychlý náhled odevzdaného pdf](Maturitní_práce/Rychly_nahled/README.md)
+
+[Odkaz na odevzdané pdf](Maturitní_práce/Protokol/E4A_Nachaj_Protokol.pdf)
+
 Maturitní prací jsem dělal pro firmu [NETTO](https://www.nettocontrol.cz/), kde jsem spojoval [kojeneckou váhu](https://www.vahynetto.cz/133-produkt-prisl-754-elektronicka-kojenecka-vaha-soehnle-professional-7752.html) s [měřidlem délky kojence](https://www.soehnle-professional.com/productgroup/details/99/baby-langenmessstab). Tyto data jsem následně posílal do aplikace pomoci Bluetooth, kterou jsem napsal v Xamarinu, kde jsem je ukládal a zobrazoval.
 
 ## [Semestrální práce Leptací box](https://github.com/PNmJunior/Semestralni_prace_Leptaci_box.git)
