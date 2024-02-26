@@ -26,7 +26,7 @@ Kalibroval a sestavoval jsem zde váhy. Sestavoval jsem rozvaděče pro vážen�
 
 # Projekty a soutěže
 
-## [HobbyRobot team Sezóna 2016/2017](http://hobbyrobot.team/season-2016-2017/)
+## HobbyRobot team Sezóna 2016/2017
 Byl jsem členem tohoto týmu v sezoně 2016/2017. Soutěžili jsme v [FLL](https://www.firstlegoleague.org/past-challenges). Postoupili jsme z pražského kola  do východoevropského kola v  Debrecíně, kde jsme vyhráli vědecký projekt. Zabývali jsme se vložení senzorů do netopýří budky.
 
 ## [Užlabinos](Užlabinos/readme.md)
