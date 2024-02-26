@@ -22,6 +22,11 @@ Firma se zabývá:
 
 Kalibroval a sestavoval jsem zde váhy. Sestavoval jsem rozvaděče pro vážení a řízení výroby. Výroba průmyslových elektronických komponentů a kabeláže.
 
+## [HARDWARIO a.s. ](https://www.hardwario.com/cs)
+Od 21.8.2023 do 1.9.2023
+
+Zabýval jsem se možnostmi rozšířením prodeje a návrhy nových modulů pro stavebnice [Hardwario Tower](https://obchod.hardwario.cz/stavebnice/).
+
 ---------------
 
 # Projekty a soutěže
